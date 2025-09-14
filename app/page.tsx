@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { GradientBackground } from "@/components/ui/gradient-background";
 import Sidebar from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
@@ -10,31 +13,41 @@ import {
     Plus,
     ArrowUp,
     SlidersHorizontal,
+    Menu,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-function MainHeader() {
+
+function MainHeader({ onToggleSidebar, isSidebarOpen }: { onToggleSidebar: () => void; isSidebarOpen: boolean }) {
     return (
-        <header className="flex items-center justify-end p-4 gap-2">
-            <Button variant="outline" className="glass-button">
-                Upgrade
+        <header className="flex items-center justify-between p-4 gap-2">
+            <Button variant="ghost" size="icon" onClick={onToggleSidebar}>
+                <Menu className="h-6 w-6" />
             </Button>
-            <Button variant="outline" className="glass-button">
-                Feedback
-            </Button>
-            <div className="h-8 w-8 rounded-full bg-primary/80 flex items-center justify-center font-bold text-sm text-primary-foreground">
-                Y
+            <div className="flex items-center gap-2">
+                <Button variant="outline" className="glass-button">
+                    Upgrade
+                </Button>
+                <Button variant="outline" className="glass-button">
+                    Feedback
+                </Button>
+                <div className="h-8 w-8 rounded-full bg-primary/80 flex items-center justify-center font-bold text-sm text-primary-foreground">
+                    Y
+                </div>
             </div>
         </header>
     );
 }
 
 export default function Home() {
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
     return (
         <div className="flex min-h-screen w-full relative">
             <GradientBackground />
-            <Sidebar />
-            <div className="flex flex-1 flex-col">
-                <MainHeader />
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+            <div className={cn("flex flex-1 flex-col transition-all duration-300", isSidebarOpen ? "ml-72" : "ml-0")}>
+                <MainHeader onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
                 <main className="flex flex-1 items-center justify-center p-4">
                     <div className="w-full max-w-3xl text-center">
                         <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl gradient-text">

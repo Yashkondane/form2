@@ -1,10 +1,11 @@
 "use client";
 
 import { Button } from "./ui/button";
-import { Search, Folder, Clock, Users, Star, ChevronDown } from "lucide-react";
+import { Search, Folder, Clock, Users, Star, ChevronDown, X } from "lucide-react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const navItems = [
         { icon: Search, label: "Search" },
         { icon: Folder, label: "Projects" },
@@ -21,9 +22,12 @@ export default function Sidebar() {
     ];
 
     return (
-        <aside className="w-72 m-2 mr-0 p-4 space-y-6 glass-card flex flex-col">
-            <div className="flex-shrink-0">
-                <Button className="w-full bg-primary/90 backdrop-blur-sm">New Chat</Button>
+        <aside className={cn("fixed top-0 left-0 h-full w-72 m-2 mr-0 p-4 space-y-6 glass-card flex-col transition-transform duration-300", isOpen ? "translate-x-0" : "-translate-x-full")}>
+            <div className="flex items-center justify-between">
+                <Button size="sm" className="bg-primary/90 backdrop-blur-sm">New Chat</Button>
+                <Button variant="ghost" size="icon" onClick={onClose} className="md:hidden">
+                    <X className="h-6 w-6" />
+                </Button>
             </div>
             <nav className="space-y-2 flex-shrink-0">
                 {navItems.map((item) => (
