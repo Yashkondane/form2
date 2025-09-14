@@ -5,7 +5,11 @@ import { Search, Folder, Clock, Users, Star, ChevronDown, X } from "lucide-react
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-export default function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export default function Sidebar({isOpen, onClose, onToggle}: {
+    isOpen: boolean,
+    onClose: () => void,
+    onToggle?: () => void
+}) {
     const navItems = [
         { icon: Search, label: "Search" },
         { icon: Folder, label: "Projects" },

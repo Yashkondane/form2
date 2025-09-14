@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GradientBackground } from "@/components/ui/gradient-background";
+import { SoundWaveAnimation } from "@/components/ui/sound-wave-animation";
 import Sidebar from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,10 +19,10 @@ import {
 import { cn } from "@/lib/utils";
 
 
-function MainHeader({ onToggleSidebar, isSidebarOpen }: { onToggleSidebar: () => void; isSidebarOpen: boolean }) {
+function MainHeader({ onToggleSidebar }: { onToggleSidebar: () => void; }) {
     return (
         <header className="flex items-center justify-between p-4 gap-2">
-            <Button variant="ghost" size="icon" onClick={onToggleSidebar}>
+            <Button variant="ghost" size="icon" onClick={onToggleSidebar} className="glass-button">
                 <Menu className="h-6 w-6" />
             </Button>
             <div className="flex items-center gap-2">
@@ -42,12 +43,19 @@ function MainHeader({ onToggleSidebar, isSidebarOpen }: { onToggleSidebar: () =>
 export default function Home() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
+
     return (
         <div className="flex min-h-screen w-full relative">
             <GradientBackground />
-            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-            <div className={cn("flex flex-1 flex-col transition-all duration-300", isSidebarOpen ? "ml-72" : "ml-0")}>
-                <MainHeader onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
+            <SoundWaveAnimation />
+            <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
+
+            <div className={cn("flex flex-1 flex-col transition-all duration-300 ease-in-out", isSidebarOpen ? "md:ml-72" : "ml-0")}>
+                <MainHeader onToggleSidebar={toggleSidebar} />
+
                 <main className="flex flex-1 items-center justify-center p-4">
                     <div className="w-full max-w-3xl text-center">
                         <h1 className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl lg:text-7xl gradient-text">
@@ -80,14 +88,7 @@ export default function Home() {
                                 <span className="sr-only">Submit</span>
                             </Button>
                         </div>
-                        <div className="mt-4 p-3 rounded-lg border border-white/20 bg-white/10 flex justify-between items-center text-sm glass-card">
-                            <p>
-                                Upgrade to Team to unlock all of v0's features and more credits
-                            </p>
-                            <Button size="sm" className="bg-primary/90 backdrop-blur-sm">
-                                Upgrade Plan
-                            </Button>
-                        </div>
+
                         <div className="mt-6 flex flex-wrap justify-center gap-3">
                             <Button variant="outline" className="glass-button">
                                 <Camera className="mr-2 h-4 w-4" />

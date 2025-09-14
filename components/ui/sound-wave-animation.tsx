@@ -16,139 +16,86 @@ export function SoundWaveAnimation({ className }: SoundWaveAnimationProps) {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    // Set canvas dimensions
+    let animationFrameId: number;
+
     const setCanvasDimensions = () => {
-      canvas.width = window.innerWidth
-      canvas.height = 400
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
     }
 
-    setCanvasDimensions()
-    window.addEventListener("resize", setCanvasDimensions)
+    setCanvasDimensions();
+    window.addEventListener("resize", setCanvasDimensions);
 
-    // Wave parameters with increased opacity and added stroke colors
-    const waves = [
-      {
-        amplitude: 40,
-        frequency: 0.005,
-        speed: 0.03,
-        color: "rgba(59, 130, 246, 0.35)",
-        strokeColor: "rgba(59, 130, 246, 0.5)",
-        offset: 0,
-      },
-      {
-        amplitude: 25,
-        frequency: 0.015,
-        speed: 0.02,
-        color: "rgba(99, 102, 241, 0.3)",
-        strokeColor: "rgba(99, 102, 241, 0.45)",
-        offset: 100,
-      },
-      {
-        amplitude: 15,
-        frequency: 0.025,
-        speed: 0.01,
-        color: "rgba(139, 92, 246, 0.25)",
-        strokeColor: "rgba(139, 92, 246, 0.4)",
-        offset: 200,
-      },
-      {
-        amplitude: 30,
-        frequency: 0.01,
-        speed: 0.015,
-        color: "rgba(79, 70, 229, 0.3)",
-        strokeColor: "rgba(79, 70, 229, 0.45)",
-        offset: 300,
-      },
-    ]
+    const waves = Array(5).fill(null).map(() => ({
+      amplitude: Math.random() * 80 + 20, // Taller waves
+      frequency: Math.random() * 0.005 + 0.001, // Slower, wider waves
+      speed: Math.random() * 0.01 + 0.005,
+      color: `rgba(${50 + Math.random() * 50}, ${100 + Math.random() * 50}, ${200 + Math.random() * 55}, ${Math.random() * 0.2 + 0.2})`, // Increased opacity
+      offset: Math.random() * 1000,
+      width: Math.random() * 1.5 + 1.5, // Thicker lines
+    }));
 
-    let animationFrameId: number
     let time = 0
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      const rect = canvas.getBoundingClientRect();
+      ctx.clearRect(0, 0, rect.width, rect.height);
 
       waves.forEach((wave) => {
-        drawWave(ctx, wave, time, canvas.width, canvas.height)
-      })
+        drawWave(ctx, wave, time, rect.width, rect.height);
+      });
 
-      time += 0.05
-      animationFrameId = requestAnimationFrame(animate)
+      time += 0.02;
+      animationFrameId = requestAnimationFrame(animate);
     }
 
     const drawWave = (
-      ctx: CanvasRenderingContext2D,
-      wave: {
-        amplitude: number
-        frequency: number
-        speed: number
-        color: string
-        strokeColor: string
-        offset: number
-      },
-      time: number,
-      width: number,
-      height: number,
+        ctx: CanvasRenderingContext2D,
+        wave: any,
+        time: number,
+        width: number,
+        height: number,
     ) => {
-      const { amplitude, frequency, speed, color, strokeColor, offset } = wave
-      const y = height / 2
+      const { amplitude, frequency, speed, color, offset, width: waveWidth } = wave;
+      const y = height / 2;
 
-      // First draw the filled wave
-      ctx.beginPath()
+      ctx.beginPath();
 
-      // Store the wave points to reuse for stroke
-      const points: [number, number][] = []
-
-      // Draw the top curve of the wave
       for (let x = 0; x < width; x++) {
-        // Create a sine wave pattern
-        const dx = x * frequency
-        const sine = Math.sin(dx + time * speed + offset)
-        const dy = sine * amplitude
-
-        const point: [number, number] = [x, y + dy]
-        points.push(point)
+        const angle = x * frequency + time * speed + offset;
+        // Combine multiple sin/cos for more organic movement
+        const yOffset = Math.sin(angle) * 0.6 + Math.cos(angle * 0.5) * 0.4;
+        const dy = yOffset * amplitude;
 
         if (x === 0) {
-          ctx.moveTo(x, y + dy)
+          ctx.moveTo(x, y + dy);
         } else {
-          ctx.lineTo(x, y + dy)
+          ctx.lineTo(x, y + dy);
         }
       }
 
-      // Complete the path by drawing to the bottom right and back to start
-      ctx.lineTo(width, height)
-      ctx.lineTo(0, height)
-      ctx.closePath()
-
-      // Fill with gradient
-      const gradient = ctx.createLinearGradient(0, 0, 0, height)
-      gradient.addColorStop(0, color)
-      gradient.addColorStop(1, "rgba(255, 255, 255, 0)")
-      ctx.fillStyle = gradient
-      ctx.fill()
-
-      // Now draw just the top curve with a stroke for more visibility
-      ctx.beginPath()
-      points.forEach((point, index) => {
-        if (index === 0) {
-          ctx.moveTo(point[0], point[1])
-        } else {
-          ctx.lineTo(point[0], point[1])
-        }
-      })
-
-      ctx.strokeStyle = strokeColor
-      ctx.lineWidth = 1.5
-      ctx.stroke()
+      ctx.strokeStyle = color;
+      ctx.lineWidth = waveWidth;
+      ctx.stroke();
     }
 
-    animate()
+    animate();
 
     return () => {
-      window.removeEventListener("resize", setCanvasDimensions)
-      cancelAnimationFrame(animationFrameId)
+      window.removeEventListener("resize", setCanvasDimensions);
+      cancelAnimationFrame(animationFrameId);
     }
   }, [])
 
-  return <canvas ref={canvasRef} className={`absolute w-full h-[400px] opacity-80 ${className}`} aria-hidden="true" />
+  return (
+      <canvas
+          ref={canvasRef}
+          className={`fixed top-0 left-0 w-full h-full -z-20 ${className}`}
+          aria-hidden="true"
+      />
+  )
 }
+
