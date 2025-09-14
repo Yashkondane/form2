@@ -99,3 +99,7 @@
   content: "";
   @apply absolute -z-10 w-full h-full top-0 left-0 blur-3xl opacity-30 bg-gradient-to-r from-primary/50 to-purple-500/50 rounded-full;
 }
+
+.dark-outline-button {
+  @apply bg-gray-900 border border-gray-700 hover:bg-gray-800 text-gray-300;
+}
