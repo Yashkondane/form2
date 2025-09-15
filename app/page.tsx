@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { GradientBackground } from "@/components/ui/gradient-background";
-import { SoundWaveAnimation } from "@/components/ui/sound-wave-animation";
 import Sidebar from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,15 +42,21 @@ function MainHeader({ onToggleSidebar }: { onToggleSidebar: () => void; }) {
 
 export default function Home() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [prompt, setPrompt] = useState("");
+    const router = useRouter();
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
+    const handleCreateForm = () => {
+        if (!prompt.trim()) return;
+        router.push(`/build?prompt=${encodeURIComponent(prompt)}`);
+    };
+
     return (
         <div className="flex min-h-screen w-full relative">
             <GradientBackground />
-            <SoundWaveAnimation />
             <Sidebar isOpen={isSidebarOpen} onToggle={toggleSidebar} />
 
             <div className={cn("flex flex-1 flex-col transition-all duration-300 ease-in-out", isSidebarOpen ? "md:ml-72" : "ml-0")}>
@@ -66,7 +72,9 @@ export default function Home() {
                         </p>
                         <div className="relative mt-8">
                             <Textarea
-                                placeholder="Ask v0 to build..."
+                                placeholder="make a form to take input of students for a hackathon"
+                                value={prompt}
+                                onChange={(e) => setPrompt(e.target.value)}
                                 className="w-full resize-none rounded-xl border-white/20 bg-white/10 p-4 pr-16 text-base text-foreground placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-primary/50 glass-effect"
                                 rows={2}
                             />
@@ -82,6 +90,7 @@ export default function Home() {
                             </div>
                             <Button
                                 size="icon"
+                                onClick={handleCreateForm}
                                 className="absolute bottom-2.5 right-2.5 h-9 w-9 bg-white/20 hover:bg-white/30"
                             >
                                 <ArrowUp className="h-5 w-5" />
